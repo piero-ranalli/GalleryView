@@ -265,6 +265,20 @@ if (typeof Object.create !== 'function') {
 				marginBottom: this.opts.frame_gap
 			});
 			
+			if(!create){
+				//also change clones
+				dom.gv_filmstrip.find('.gv_thumbnail').css({
+					width: this.opts.frame_width,
+					height: this.opts.frame_height
+				});
+				dom.gv_filmstrip.find('.gv_frame').css({
+					width: gv.outerWidth(dom.gv_thumbnail),
+					height: gv.outerHeight(dom.gv_thumbnail) + (this.opts.show_captions ? gv.outerHeight(dom.gv_caption) : 0),
+					marginRight: this.opts.frame_gap,
+					marginBottom: this.opts.frame_gap
+				});
+			}
+			
 			
 			if(this.filmstripOrientation === 'horizontal') {
 				this.filmstripSize = Math.floor((gv.outerWidth(dom.gv_panelWrap) - gv.outerWidth(dom.gv_navWrap)) / (gv.outerWidth(dom.gv_frame) + this.opts.frame_gap));
@@ -386,59 +400,61 @@ if (typeof Object.create !== 'function') {
 			}
 		},
 		
-		buildFilmstrip: function() {
+		buildFilmstrip: function(create) {
+			create = typeof create !== 'undefined' ? create : true;
+		
 			var self = this,
 				dom = this.dom,
 				framesLength = this.gvImages.length * ((this.filmstripOrientation === 'horizontal' ? this.opts.frame_width : this.opts.frame_height) + this.opts.frame_gap);
 			
-			dom.gv_frame.append(dom.gv_thumbnail);
-			if(this.opts.show_captions) { 
-				dom.gv_frame.append(dom.gv_caption);
-			}
-			dom.gv_thumbnail.css('opacity',this.opts.frame_opacity);
-			
-			dom.gv_thumbnail.bind({
-				mouseover: function() {
-					if(!$(this).hasClass('current')) {
-						$(this).stop().animate({opacity:1},250);
-					}
-				},
-				mouseout: function() {
-					if(!$(this).hasClass('current')) {
-						$(this).stop().animate({opacity:self.opts.frame_opacity},250);
-					}
+			if(create){
+				dom.gv_frame.append(dom.gv_thumbnail);
+				if(this.opts.show_captions) { 
+					dom.gv_frame.append(dom.gv_caption);
 				}
-			});
-			
-			// Drop a clone of the frame element into the filmstrip for each source image
-			$.each(this.gvImages,function(i,img) {
-				dom.gv_frame.clone(true).prependTo(dom.gv_filmstrip);
-			});
+				dom.gv_thumbnail.css('opacity',this.opts.frame_opacity);
+				
+				dom.gv_thumbnail.bind({
+					mouseover: function() {
+						if(!$(this).hasClass('current')) {
+						$(this).stop().animate({opacity:1},250);
+						}
+					},
+					mouseout: function() {
+						if(!$(this).hasClass('current')) {
+							$(this).stop().animate({opacity:self.opts.frame_opacity},250);
+						}
+					}
+				});
+				
+				// Drop a clone of the frame element into the filmstrip for each source image
+				$.each(this.gvImages,function(i,img) {
+					dom.gv_frame.clone(true).prependTo(dom.gv_filmstrip);
+				});
+			}
 			
 			dom.gv_filmstrip.css({
 				width: gv.outerWidth(dom.gv_frame),
 				height: gv.outerHeight(dom.gv_frame)
 			});
+      
+			this.framesLength=framesLength;
 			
 			// If we are scrolling the filmstrip, and we can't show all frames at once,
 			// make two additional copies of each frame
 			if(this.opts.filmstrip_style === 'scroll') {
 				if(this.filmstripOrientation === 'horizontal') {
-					if(framesLength > gv.innerWidth(dom.gv_filmstripWrap)) {
-						dom.gv_filmstrip.find('.gv_frame').clone(true).appendTo(dom.gv_filmstrip).clone(true).appendTo(dom.gv_filmstrip);
-						dom.gv_filmstrip.css('width',framesLength * 3);
-						this.scrolling = true;
-					} else {
-						dom.gv_filmstrip.css('width',framesLength);
+					if(create){
+						dom.gv_filmstrip.find('.gv_frame').clone(true).addClass("hideifnoscrolling").appendTo(dom.gv_filmstrip).clone(true).appendTo(dom.gv_filmstrip);
 					}
+          
+					this.activateScrolling(framesLength > gv.innerWidth(dom.gv_filmstripWrap));
 				} else {
-					if(framesLength > gv.innerHeight(dom.gv_filmstripWrap)) {
+					if(create){
 						dom.gv_filmstrip.find('.gv_frame').clone(true).appendTo(dom.gv_filmstrip).clone(true).appendTo(dom.gv_filmstrip);
-						dom.gv_filmstrip.css('height',framesLength * 3);
-						this.scrolling = true;
-					} else {
-						dom.gv_filmstrip.css('height',framesLength);
 					}
+          
+					this.activateScrolling(framesLength > gv.innerHeight(dom.gv_filmstripWrap));
 				}
 			} else {
 				dom.gv_filmstrip.css({
@@ -446,11 +462,60 @@ if (typeof Object.create !== 'function') {
 					height: parseInt(dom.gv_filmstripWrap.css('height'),10)+this.opts.frame_gap
 				});
 			}
-			dom.gv_frames = dom.gv_filmstrip.find('.gv_frame');
-			$.each(dom.gv_frames,function(i,frame) {
-				$(frame).data('frameIndex',i);						  
-			});
-			dom.gv_thumbnails = dom.gv_filmstrip.find('div.gv_thumbnail');
+			
+			if(create){
+				dom.gv_frames = dom.gv_filmstrip.find('.gv_frame');
+				$.each(dom.gv_frames,function(i,frame) {
+					$(frame).data('frameIndex',i);						  
+				});
+				dom.gv_thumbnails = dom.gv_filmstrip.find('div.gv_thumbnail');
+			}
+		},
+		
+		activateScrolling: function(activate){
+		
+			// activate / deactivate scrolling and set the correct filmstripsize
+			var dom = this.dom;
+			if(this.filmstripOrientation === 'horizontal') {
+				if(activate) {
+					dom.gv_filmstrip.css('width',this.framesLength * 3);
+					this.scrolling = true;
+				} else {
+					dom.gv_filmstrip.css('width',this.framesLength);
+					this.scrolling = false;
+				}
+			}else{
+				if(activate) {
+					dom.gv_filmstrip.css('height',this.framesLength * 3);
+					this.scrolling = true;
+				} else {
+					dom.gv_filmstrip.css('height',this.framesLength);
+					this.scrolling = false;
+				}
+			}
+      
+			// show / hide the extra thumbs used in the scroller
+			if(activate){
+				this.dom.gv_filmstrip.find('.hideifnoscrolling').show();
+			}else{
+				this.dom.gv_filmstrip.find('.hideifnoscrolling').hide();
+			}
+      
+			//stop thumb animation
+			if(dom.gv_thumbnails!=undefined){
+				dom.gv_thumbnails.stop(true,true);
+			}
+      
+			//scroll to correct location
+			this.dom.gv_filmstrip.stop(true,true).css({left:0, top:0});
+      
+			if(activate) {
+				var currentFrame = this.frameIterator;
+				this.frameIterator=0;//scroll from position 0
+				this.updateFilmstrip(currentFrame);
+				
+				this.dom.gv_filmstrip.stop(true,true);
+			}
 		},
 		
 		buildGallery: function(create) {
@@ -463,9 +528,7 @@ if (typeof Object.create !== 'function') {
 			this.setPositions(create);
 			
 			if(this.opts.show_filmstrip) {
-				if(create){
-					this.buildFilmstrip();
-				}
+				this.buildFilmstrip(create);
 			}
 		},
 		
@@ -1068,11 +1131,13 @@ if (typeof Object.create !== 'function') {
 		/*
 		 * Resizing code...
 		 */
-		resizeGallery: function(width, height){
+		resizeGallery: function(panel_width, panel_height, frame_width, frame_height){
 	  
 			// new width and height
-			this.opts.panel_width = width;
-			this.opts.panel_height = height;
+			if(panel_width!=undefined){ this.opts.panel_width = panel_width; }
+			if(panel_height!=undefined){ this.opts.panel_height = panel_height; }
+			if(frame_width!=undefined){ this.opts.frame_width = frame_width; }
+			if(frame_height!=undefined){ this.opts.frame_height = frame_height; }
 		
 			// resize gallery: dimensions & positions
 			this.buildGallery(false);
@@ -1103,12 +1168,16 @@ if (typeof Object.create !== 'function') {
 	
 	/*
 	 * MAIN RESIZING CODE
+	 *
+	 * Call this method to resize the panel and/or the frames
+	 *
+	 * All arguments are optional (use undefined)
 	 */
-	$.fn.resizeGalleryView = function (width, height){
+	$.fn.resizeGalleryView = function (panel_width, panel_height, frame_width, frame_height){
 		if (this.length) {
 			return this.each(function () {
 				if(this.galleryViewForObject){
-					this.galleryViewForObject.resizeGallery(width, height);
+					this.galleryViewForObject.resizeGallery(panel_width, panel_height, frame_width, frame_height);
 				}
 			});
 		}
