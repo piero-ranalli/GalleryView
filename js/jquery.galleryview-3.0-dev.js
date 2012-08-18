@@ -630,11 +630,11 @@ if (typeof Object.create !== 'function') {
 			
 			switch(this.opts.panel_animation) {
 				case 'crossfade':
-					dom.gv_panels.eq(this.iterator).fadeOut(this.opts.transition_speed,function(){$(this).remove();});
+					dom.gv_panels.eq(this.iterator).fadeOut(this.opts.transition_speed,function(){$(this).detach();});
 					panel.hide().prependTo(dom.gv_panelWrap).fadeIn(this.opts.transition_speed);
 					break;
 				case 'fade':
-					dom.gv_panels.eq(this.iterator).remove();
+					dom.gv_panels.eq(this.iterator).detach();
 					panel.hide().prependTo(dom.gv_panelWrap).fadeIn(this.opts.transition_speed);
 					break;
 				case 'slide':
@@ -653,11 +653,11 @@ if (typeof Object.create !== 'function') {
 					
 					dom.gv_panels.eq(this.iterator).animate(
 						{ left: oldPanelEnd },
-						{ duration: this.opts.transition_speed, easing: this.opts.easing, complete: function(){ $(this).remove(); } }
+						{ duration: this.opts.transition_speed, easing: this.opts.easing, complete: function(){ $(this).detach(); } }
 					);
 					break;
 				default:
-					dom.gv_panels.eq(this.iterator).remove();
+					dom.gv_panels.eq(this.iterator).detach();
 					panel.prependTo(dom.gv_panelWrap);
 					break;
 			}
@@ -1077,8 +1077,11 @@ if (typeof Object.create !== 'function') {
 			// resize gallery: dimensions & positions
 			this.buildGallery(false);
 			
-			// resize images
+			// resize images in view
 			$("img", this.gv_galleryWrap).trigger( "resizeme" );
+			
+			// resize images out of view
+			$("img", this.dom.gv_panels).trigger( "resizeme" );
 		}
 		
 	}; // END GalleryView
