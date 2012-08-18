@@ -19,7 +19,7 @@
 <!-- Lastly, call the galleryView() function on your unordered list(s) -->
 <script type="text/javascript">
 	$(function(){
-		$('#myGallery').galleryView({
+		var gallerylu = $('#myGallery').galleryView({
 		transition_speed: 2000, 		//INT - duration of panel/frame transition (in milliseconds)
 		transition_interval: 4000, 		//INT - delay between panel/frame transitions (in milliseconds)
 		easing: 'swing', 				//STRING - easing method to use for animations (jQuery provides 'swing' or 'linear', more available with jQuery UI or Easing plugin)
@@ -63,7 +63,15 @@
 				$('.gv_galleryWrap').toggle();
 			}
 		});
+		
+		$('#scalebutton').click(function(){
+      gallerylu.resizeGalleryView(
+              Number($("#input_new_panel_width").val()), 
+              Number($("#input_new_panel_height").val()));
+    });
+    
 	});
+	
 </script>
 
 <style type="text/css">
@@ -93,6 +101,17 @@
             <li><img data-original="http://www.spaceforaname.com/galleryview/img/photos/bp54.jpg" src="../css/grey.gif" />
     </ul>
     <button id="btn">Toggle Gallery</button>
+    
+    <!-- scaling panel -->
+    <div style="border:1px solid grey;font-size:11pt;background-color:#EEE;width:300px;margin-top:10px;">
+      <div style="font-size:13pt;font-weight:bold">Scaling gallery 1</div>
+      <div>new_panel_width: <input type="text" id="input_new_panel_width" value="700"/></div>
+      <div>new_panel_height: <input type="text" id="input_new_panel_height" value="300"/></div>
+      
+      <button id="scalebutton">Scale gallery</button>
+    </div>
+    
+    
 	<p>Please view the source of this page if you are having difficulties setting up GalleryView.</p>
 </body>
 </html>
