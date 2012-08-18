@@ -5,6 +5,9 @@
 	Version:	3.0 DEVELOPMENT
 
   	See README.txt for instructions on how to markup your HTML
+  	
+  	
+  	Resizefunctionality by Jeroen Penninck
 */
 
 // Make sure Object.create is available in the browser (for our prototypal inheritance)
@@ -163,7 +166,9 @@ if (typeof Object.create !== 'function') {
 			});
 		},
 		
-		setDimensions: function() {
+		setDimensions: function(create) {
+			create = typeof create !== 'undefined' ? create : true;
+
 			var self = this,
 				dom = this.dom,
 				widths = {
@@ -230,13 +235,23 @@ if (typeof Object.create !== 'function') {
 			});
 			
 			
-			
-			$.each(this.gvImages,function(i,img) {
-				dom.gv_panelWrap.append(dom.gv_panel.clone(true));
-			});
-			
-			dom.gv_panels = dom.gv_panelWrap.find('.gv_panel');
-			dom.gv_panels.remove();
+			if(create){
+				$.each(this.gvImages,function(i,img) {
+					dom.gv_panelWrap.append(dom.gv_panel.clone(true));
+				});
+			  
+				dom.gv_panels = dom.gv_panelWrap.find('.gv_panel');
+				dom.gv_panels.remove();
+					
+			}else{
+				this_opts = this.opts;
+				$.each(dom.gv_panels,function(i,panel) {
+					$(panel).css({
+						width: this_opts.panel_width,
+						height: this_opts.panel_height
+					});
+				});
+			}
 			
 			// filmstrip
 			dom.gv_thumbnail.css({
@@ -300,7 +315,9 @@ if (typeof Object.create !== 'function') {
 			});
 		},
 		
-		setPositions: function() {
+		setPositions: function(create) {
+			create = typeof create !== 'undefined' ? create : true;
+			
 			var self = this,
 				dom = this.dom,
 				navVert = 0, fsVert = 0,
@@ -362,8 +379,10 @@ if (typeof Object.create !== 'function') {
 				dom.gv_showOverlay.css({ bottom: 0, left: 0 });
 			}
 			
-			if(!this.opts.show_filmstrip_nav) {
-				dom.gv_navWrap.remove();	
+			if(create){
+				if(!this.opts.show_filmstrip_nav) {
+					dom.gv_navWrap.remove();	
+				}
 			}
 		},
 		
@@ -434,15 +453,19 @@ if (typeof Object.create !== 'function') {
 			dom.gv_thumbnails = dom.gv_filmstrip.find('div.gv_thumbnail');
 		},
 		
-		buildGallery: function() {
+		buildGallery: function(create) {
+			create = typeof create !== 'undefined' ? create : true;
+	  
 			var self = this,
 				dom = this.dom;
 			
-			this.setDimensions();
-			this.setPositions();
+			this.setDimensions(create);
+			this.setPositions(create);
 			
 			if(this.opts.show_filmstrip) {
-				this.buildFilmstrip();
+				if(create){
+					this.buildFilmstrip();
+				}
 			}
 		},
 		
@@ -488,6 +511,30 @@ if (typeof Object.create !== 'function') {
 					});
 					_img.hide().css('visibility','visible');
 					_img.remove().appendTo(parent);
+					
+					_img.bind("resizeme", function(){
+						var _img = $(this),
+							index = _img.data('index'),
+							width = this.width,
+							height = this.height,
+							//parent = dom[(_img.data('parent')).type].eq((_img.data('parent')).index),
+							widthFactor = gv.innerWidth(parent) / width,
+							heightFactor = gv.innerHeight(parent) / height,
+							parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame',
+							heightOffset = 0, widthOffset = 0;
+						
+						gvImage.scale[parentType] = self.opts[parentType+'_scale'] === 'fit' ? Math.min(widthFactor,heightFactor) : Math.max(widthFactor,heightFactor);
+						
+						widthOffset = Math.round((gv.innerWidth(parent) - (width * gvImage.scale[parentType])) / 2);
+						heightOffset = Math.round((gv.innerHeight(parent) - (height * gvImage.scale[parentType])) / 2);	
+						
+						_img.css({
+							width: width * gvImage.scale[parentType],
+							height: height * gvImage.scale[parentType],
+							top: heightOffset,
+							left: widthOffset
+						});
+					});
 					
 					if(parentType === 'frame') {
 						_img.fadeIn();
@@ -1016,6 +1063,22 @@ if (typeof Object.create !== 'function') {
 			
 			this.updateOverlay(this.iterator);
 			this.updateFilmstrip(this.frameIterator);
+		},
+		
+		/*
+		 * Resizing code...
+		 */
+		resizeGallery: function(width, height){
+	  
+			// new width and height
+			this.opts.panel_width = width;
+			this.opts.panel_height = height;
+		
+			// resize gallery: dimensions & positions
+			this.buildGallery(false);
+			
+			// resize images
+			$("img", this.gv_galleryWrap).trigger( "resizeme" );
 		}
 		
 	}; // END GalleryView
@@ -1028,6 +1091,22 @@ if (typeof Object.create !== 'function') {
 			return this.each(function () {
 				var gallery = Object.create(GalleryView);
 				gallery.init(options,this);
+				
+				/* -- resizecode -- keep object for when resize is called */
+				this.galleryViewForObject = gallery;
+			});
+		}
+	};
+	
+	/*
+	 * MAIN RESIZING CODE
+	 */
+	$.fn.resizeGalleryView = function (width, height){
+		if (this.length) {
+			return this.each(function () {
+				if(this.galleryViewForObject){
+					this.galleryViewForObject.resizeGallery(width, height);
+				}
 			});
 		}
 	};
