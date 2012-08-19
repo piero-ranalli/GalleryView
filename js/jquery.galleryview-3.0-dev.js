@@ -727,13 +727,19 @@ if (typeof Object.create !== 'function') {
 					break;
 			}
 			
+			// call the resize event again because IE does not seem to like it
+			// when image are resized that are not on the screen...
+			$("img", this.gv_galleryWrap).trigger( "resizeme" );
+			
 			this.updateOverlay(i);
 			
 			this.iterator = i;
 			this.updateFilmstrip(frame_i);
 			this.showInfoBar();
 			
-			document.getSelection().removeAllRanges(); // fixes selection of item
+			if(document.getSelection){
+				document.getSelection().removeAllRanges(); // fixes selection of item
+			}
 		},
 		
 		updateOverlay: function(i) {
