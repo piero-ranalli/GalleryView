@@ -555,40 +555,24 @@ if (typeof Object.create !== 'function') {
 				img.bind('load.galleryview',function() {
 					var _img = $(this),
 						index = _img.data('index'),
-						width = this.width,
-						height = this.height,
 						parent = dom[(_img.data('parent')).type].eq((_img.data('parent')).index),
-						widthFactor = gv.innerWidth(parent) / width,
-						heightFactor = gv.innerHeight(parent) / height,
-						parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame',
-						heightOffset = 0, widthOffset = 0;
+						parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame';
 					
-					gvImage.scale[parentType] = self.opts[parentType+'_scale'] === 'fit' ? Math.min(widthFactor,heightFactor) : Math.max(widthFactor,heightFactor);
-					
-					widthOffset = Math.round((gv.innerWidth(parent) - (width * gvImage.scale[parentType])) / 2);
-					heightOffset = Math.round((gv.innerHeight(parent) - (height * gvImage.scale[parentType])) / 2);	
-					
-					_img.css({
-						width: width * gvImage.scale[parentType],
-						height: height * gvImage.scale[parentType],
-						top: heightOffset,
-						left: widthOffset
-					});
-					_img.hide().css('visibility','visible');
-					_img.remove().appendTo(parent);
-					
-					_img.bind("resizeme", function(){
+					_img.bind("resizegalleryimage", function(){
 						var _img = $(this),
-							index = _img.data('index'),
 							width = this.width,
 							height = this.height,
-							//parent = dom[(_img.data('parent')).type].eq((_img.data('parent')).index),
 							widthFactor = gv.innerWidth(parent) / width,
 							heightFactor = gv.innerHeight(parent) / height,
-							parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame',
 							heightOffset = 0, widthOffset = 0;
 						
 						gvImage.scale[parentType] = self.opts[parentType+'_scale'] === 'fit' ? Math.min(widthFactor,heightFactor) : Math.max(widthFactor,heightFactor);
+						
+						//if can not upscale
+						if(!self.opts.panel_can_upscale_image && gvImage.scale[parentType]>1){
+							gvImage.scale[parentType]=1;
+						}
+						
 						
 						widthOffset = Math.round((gv.innerWidth(parent) - (width * gvImage.scale[parentType])) / 2);
 						heightOffset = Math.round((gv.innerHeight(parent) - (height * gvImage.scale[parentType])) / 2);	
@@ -600,6 +584,11 @@ if (typeof Object.create !== 'function') {
 							left: widthOffset
 						});
 					});
+					
+					_img.trigger("resizegalleryimage");
+					
+					_img.hide().css('visibility','visible');
+					_img.detach().appendTo(parent);
 					
 					if(parentType === 'frame') {
 						_img.fadeIn();
@@ -733,7 +722,7 @@ if (typeof Object.create !== 'function') {
 			
 			// call the resize event again because IE does not seem to like it
 			// when image are resized that are not on the screen...
-			$("img", this.gv_galleryWrap).trigger( "resizeme" );
+			$("img", this.gv_galleryWrap).trigger( "resizegalleryimage" );
 			
 			this.updateOverlay(i);
 			
@@ -1155,10 +1144,10 @@ if (typeof Object.create !== 'function') {
 			this.buildGallery(false);
 			
 			// resize images in view
-			$("img", this.gv_galleryWrap).trigger( "resizeme" );
+			$("img", this.gv_galleryWrap).trigger( "resizegalleryimage" );
 			
 			// resize images out of view
-			$("img", this.dom.gv_panels).trigger( "resizeme" );
+			$("img", this.dom.gv_panels).trigger( "resizegalleryimage" );
 		}
 		
 	}; // END GalleryView
@@ -1238,6 +1227,8 @@ if (typeof Object.create !== 'function') {
 		
 		// Info Bar Options
 		show_infobar: true,				//BOOLEAN - flag to show or hide infobar
-		infobar_opacity: 1				//FLOAT - transparency for info bar
+		infobar_opacity: 1,				//FLOAT - transparency for info bar
+		
+		panel_can_upscale_image: true
 	};
 })(jQuery);
