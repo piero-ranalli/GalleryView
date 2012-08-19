@@ -512,7 +512,9 @@ if (typeof Object.create !== 'function') {
 			if(activate) {
 				var currentFrame = this.frameIterator;
 				this.frameIterator=0;//scroll from position 0
-				this.updateFilmstrip(currentFrame);
+				if(dom.gv_thumbnails!=undefined){
+					this.updateFilmstrip(currentFrame);
+				}
 				
 				this.dom.gv_filmstrip.stop(true,true);
 			}
