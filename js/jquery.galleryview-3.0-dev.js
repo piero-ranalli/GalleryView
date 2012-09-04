@@ -556,12 +556,12 @@ if (typeof Object.create !== 'function') {
 					var _img = $(this),
 						index = _img.data('index'),
 						parent = dom[(_img.data('parent')).type].eq((_img.data('parent')).index),
-						parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame';
+						parentType = parent.hasClass('gv_panel') ? 'panel' : 'frame',
+            width = this.width,
+            height = this.height;
 					
 					_img.bind("resizegalleryimage", function(){
 						var _img = $(this),
-							width = this.width,
-							height = this.height,
 							widthFactor = gv.innerWidth(parent) / width,
 							heightFactor = gv.innerHeight(parent) / height,
 							heightOffset = 0, widthOffset = 0;
