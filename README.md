@@ -1,13 +1,14 @@
 Responsive GalleryView
 ===
-Based on the GalleryView of Jack Anderson.
+This code is based on the GalleryView of Jack Anderson.
+I only made it responsive.
 
-For more information about the responsive GalleryView, you can visit http://jeroenp.awardspace.com/?page=blog:responsivegalleryview .
+For more information about the *responsive* GalleryView, you can visit http://jeroenp.awardspace.com/?page=blog:responsivegalleryview#content .
 
 
 
-Original README
-===
+## Readme of GalleryView
+
 
 GalleryView - jQuery Photo Gallery Plugin
 Author: Jack Anderson
