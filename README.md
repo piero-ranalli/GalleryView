@@ -1,3 +1,14 @@
+Responsive GalleryView
+===
+Based on the GalleryView of Jack Anderson.
+
+For more information about the responsive GalleryView, you can visit http://jeroenp.awardspace.com/?page=blog:responsivegalleryview .
+
+
+
+Original README
+===
+
 GalleryView - jQuery Photo Gallery Plugin
 Author: Jack Anderson
 

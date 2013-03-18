@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" style="height:100%">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>GalleryView - Default Demo</title>
+<title>responsive GalleryView</title>
 
 <!-- First, add jQuery (and jQuery UI if using custom easing or animation -->
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -23,30 +23,11 @@
     var $gallery = $('#myGallery');//save the ul in a variable
     
 		$gallery.galleryView();// init the gallery (as usual)
-		
-		
-		//
-		// This is a demo of a responsive GalleryView.
-		//
-		// I extended the exellent GalleryView-plugin 
-		// to support resizing of the gallery.
-		//
-		// You can now call 
-		//   .resizeGalleryView(new_panel_width, new_panel_height, new_frame_width, new_frame_height); 
-		// on the gallery to resize the gallery.
-		//
-		// In this demo the gallery is resized to fit the full page.
-		//
-		// Have fun with it!
-		//
-		// - Jeroen Penninck
-		//
-		
-		
+
+
 		//
 		// resize function, gets called when the browser resizes
 		//
-		
 		function resizeTheGallery(){
         //
         // Implement your own way of resizing here!
@@ -56,7 +37,6 @@
         
         var totalhorizontalmargin = 10;//see settings of gallery
         var totalverticalmargin = 15;//see settings of gallery
-        
 
         // the new width of the thumbs
         var new_frame_width = $("#galleryContainer").width()/900*150;//just some random factor...
@@ -66,7 +46,7 @@
         var new_panel_width = $("#galleryContainer").width()-totalhorizontalmargin;
         var new_panel_height = $("#galleryContainer").height()-new_frame_height-totalverticalmargin;//note: the filmstrip is below the gallery so we have to subtract the height of a frame
 
-        // call the new resize method :)
+        // call the new resize method
         $gallery.resizeGalleryView(new_panel_width, new_panel_height, new_frame_width, new_frame_height);
 		}
 		
