@@ -1,10 +1,40 @@
-Responsive GalleryView
+Responsive GalleryView with long descriptions in external paragraph
 ===
-This code is based on the GalleryView of Jack Anderson.
-I only made it responsive.
+If you have very long descriptions for your images, they may not fit in the info
+box. This version of GalleryView can put the text in the alt="" and
+data-description="" tags into external paragraphs with
+id="gv-external-title" and id="gv-external-description",
+respectively.
 
-For more information about the *responsive* GalleryView, you can visit http://jeroenp.awardspace.com/?page=blog:responsivegalleryview#content .
+Then, when the user navigates in the image gallery, the external
+paragraphs are updated every time a different photo is displayed.
 
+
+For example:
+
+    ...
+    <li><img src="img1.jpg" alt="mytitle" data-description="two pages of text">
+    ...
+    </ul>
+    <h3 id="gv-external-title">
+    mytitle
+    </h3>
+    <p id="gv-external-description">
+    two pages of text
+
+
+Note that the title and description of the first image should be
+repeated in the paragraph so they are displayed at start.
+
+See
+[here](http://www.festivalnaturae.it/Riserva_duna_ravennate_foce_bevano.html#flora)
+for an example.
+
+This version of GalleryView is based on [Jeroen Penninck](http://jeroenp.awardspace.com/?page=blog:responsivegalleryview#content)'s
+one. Original version by Jack Anderson.
+
+
+---
 
 
 ## Readme of GalleryView
