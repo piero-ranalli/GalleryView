@@ -7,7 +7,9 @@
   	See README.txt for instructions on how to markup your HTML
   	
   	
-  	Resizefunctionality by Jeroen Penninck
+  	Resize functionality by Jeroen Penninck
+
+	Long descriptions in external paragraph: added by Piero Ranalli
 */
 
 // Make sure Object.create is available in the browser (for our prototypal inheritance)
@@ -733,6 +735,10 @@ if (typeof Object.create !== 'function') {
 			if(document.getSelection){
 				document.getSelection().removeAllRanges(); // fixes selection of item
 			}
+
+		        // put long description in external paragraph
+		        $("#gv-external-title").text( this.gvImages[i].attrs.title );
+		        $("#gv-external-description").text( this.gvImages[i].attrs.description );
 		},
 		
 		updateOverlay: function(i) {
